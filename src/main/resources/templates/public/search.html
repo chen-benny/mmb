@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Search')}"></head>
+<body>
+<nav th:replace="~{layout :: nav(true)}"></nav>
+
+<main class="container">
+    <h1>Search</h1>
+    <form class="search-form" th:action="@{/panorama/search}" method="get">
+        <input type="search" name="q" class="search-input" placeholder="search posts…"
+               th:value="${q}" autofocus>
+        <button type="submit" class="button">Search</button>
+    </form>
+
+    <div th:if="${results != null}">
+        <p class="search-count"
+           th:text="${#lists.isEmpty(results)} ? 'No results for &quot;' + ${q} + '&quot;.'
+                                               : ${results.size()} + ' result(s) for &quot;' + ${q} + '&quot;.'">
+        </p>
+        <div class="post-list" th:if="${not #lists.isEmpty(results)}">
+            <div th:each="post : ${results}" class="post-list-item">
+                <h2>
+                    <a th:href="@{/panorama/{username}/{slug}(username=${post.author.username}, slug=${post.slug})}"
+                       th:text="${post.title}">Title</a>
+                </h2>
+                <div class="post-meta">
+                    <a th:href="@{/panorama/{username}(username=${post.author.username})}"
+                       th:text="${post.author.displayName}">Author</a>
+                    <span th:text="${#temporals.format(post.publishedAt, 'yyyy-MM-dd')}"></span>
+                    <span th:each="tag : ${post.tags}">
+                        <a class="tag"
+                           th:href="@{/panorama/{username}/tag/{slug}(username=${post.author.username}, slug=${tag.slug})}"
+                           th:text="${tag.name}">tag</a>
+                    </span>
+                </div>
+                <p class="description"
+                   th:if="${post.description != null and !post.description.isEmpty()}"
+                   th:text="${post.description}"></p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout :: footer}"></footer>
+</body>
+</html>

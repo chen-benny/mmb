@@ -123,6 +123,7 @@ public class PublicController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + username));
         Post post = postService.getPublishedPost(author, slug)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found: " + slug));
+        postService.incrementViewCount(post.getId());
         model.addAttribute("author", author);
         model.addAttribute("post", post);
         model.addAttribute("renderedBody", markdownService.render(post.getBodyMd()));
@@ -131,6 +132,38 @@ public class PublicController {
         model.addAttribute("canonicalUrl", baseUrl + "/panorama/" + username + "/" + slug);
         model.addAttribute("rssUrl", baseUrl + "/panorama/" + username + "/feed.xml");
         return "public/post";
+    }
+
+    @GetMapping("/panorama/search")
+    public String search(@RequestParam(required = false, defaultValue = "") String q, Model model) {
+        model.addAttribute("q", q);
+        if (!q.isBlank()) {
+            model.addAttribute("results", postService.searchPublished(q));
+        }
+        return "public/search";
+    }
+
+    @GetMapping("/sitemap.xml")
+    @ResponseBody
+    public ResponseEntity<String> sitemap() {
+        List<Post> posts = postService.getAllPublishedPosts();
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        sb.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");
+        sb.append("<url><loc>").append(xmlEscape(baseUrl)).append("/panorama</loc></url>\n");
+        for (Post post : posts) {
+            String loc = baseUrl + "/panorama/" + post.getAuthor().getUsername() + "/" + post.getSlug();
+            sb.append("<url>\n");
+            sb.append("  <loc>").append(xmlEscape(loc)).append("</loc>\n");
+            if (post.getPublishedAt() != null) {
+                sb.append("  <lastmod>").append(post.getPublishedAt().toLocalDate()).append("</lastmod>\n");
+            }
+            sb.append("</url>\n");
+        }
+        sb.append("</urlset>\n");
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/xml;charset=UTF-8"))
+                .body(sb.toString());
     }
 
     @GetMapping("/panorama/{username}/feed.xml")

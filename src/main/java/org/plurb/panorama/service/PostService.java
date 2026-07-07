@@ -47,6 +47,19 @@ public class PostService {
                 .filter(post -> post.getStatus().equals(PostStatus.PUBLISHED));
     }
 
+    @Transactional
+    public void incrementViewCount(Long postId) {
+        postRepository.incrementViewCount(postId);
+    }
+
+    public List<Post> searchPublished(String query) {
+        return postRepository.searchPublished(query);
+    }
+
+    public List<Post> getAllPublishedPosts() {
+        return postRepository.findByStatusOrderByPublishedAtDesc(PostStatus.PUBLISHED);
+    }
+
     public Optional<Post> getPostById(Long id) {
         return postRepository.findById(id);
     }

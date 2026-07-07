@@ -6,6 +6,7 @@ import org.plurb.panorama.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.OffsetDateTime;
@@ -34,4 +35,18 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByAuthorAndStatusAndPublishedAtAfterOrderByPublishedAtAsc(
         User author, PostStatus status, OffsetDateTime publishedAt, Pageable pageable
     );
+
+    @Modifying
+    @Query("UPDATE Post p SET p.viewCount = p.viewCount + 1 WHERE p.id = :id")
+    void incrementViewCount(@Param("id") Long id);
+
+    @Query(value = """
+            SELECT * FROM posts
+            WHERE status = 'PUBLISHED'
+              AND search_vector @@ plainto_tsquery('english', :q)
+            ORDER BY ts_rank(search_vector, plainto_tsquery('english', :q)) DESC
+            """, nativeQuery = true)
+    List<Post> searchPublished(@Param("q") String q);
+
+    List<Post> findByStatusOrderByPublishedAtDesc(PostStatus status);
 }

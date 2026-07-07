@@ -20,6 +20,7 @@
             <tr>
                 <th>Title</th>
                 <th>Status</th>
+                <th>Views</th>
                 <th>Date</th>
                 <th>Actions</th>
             </tr>
@@ -34,6 +35,7 @@
                           th:text="${post.title}">Title</span>
                 </td>
                 <td th:text="${post.status}">DRAFT</td>
+                <td th:text="${post.viewCount}">0</td>
                 <td th:text="${post.publishedAt != null}
                         ? ${#temporals.format(post.publishedAt, 'yyyy-MM-dd')}
                         : ${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">Date</td>

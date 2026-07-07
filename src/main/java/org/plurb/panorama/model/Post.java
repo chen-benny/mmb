@@ -48,6 +48,9 @@ public class Post {
     @Column(name = "cover_image_url", length = 512)
     private String coverImageUrl;
 
+    @Column(name = "view_count", nullable = false)
+    private long viewCount = 0;
+
     @ManyToMany
     @JoinTable(
         name = "post_tags",
@@ -94,4 +97,7 @@ public class Post {
 
     public String getCoverImageUrl() { return coverImageUrl; }
     public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
+
+    public long getViewCount() { return viewCount; }
+    public void setViewCount(long viewCount) { this.viewCount = viewCount; }
 }

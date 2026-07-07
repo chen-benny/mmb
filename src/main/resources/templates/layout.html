@@ -32,12 +32,20 @@
 <nav>
     <div th:class="${isPanorama} ? 'nav-inner' : 'nav-inner nav-inner-wide'">
         <div class="nav-brand-group">
-            <a class="nav-brand" th:href="${isPanorama} ? @{/panorama} : @{/}"
-               th:text="${isPanorama} ? 'panorama' : 'plurb'">brand</a>
+            <a class="nav-brand" th:href="${isPanorama} ? @{/panorama} : @{/}">
+                <img th:src="@{/static/logo.svg}" alt="plurb" class="nav-logo">
+                <span class="nav-brand-sub" th:if="${isPanorama}">panorama</span>
+            </a>
             <span class="nav-tagline"
                   th:text="${isPanorama} ? 'you are what you show.' : 'out of many, one.'"></span>
         </div>
         <div class="nav-links">
+            <th:block th:if="${isPanorama}">
+                <form class="nav-search" th:action="@{/panorama/search}" method="get">
+                    <input type="search" name="q" placeholder="search…" class="nav-search-input"
+                           th:value="${q != null ? q : ''}">
+                </form>
+            </th:block>
             <span sec:authorize="isAuthenticated()">
                 <th:block th:if="${isPanorama}">
                     <a class="nav-btn" th:href="@{/panorama/editor}">dashboard</a>
