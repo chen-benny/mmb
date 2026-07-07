@@ -76,6 +76,8 @@
 
         <div class="form-actions">
             <button type="submit">Save</button>
+            <a th:if="${post != null}" th:href="@{/panorama/editor/{id}/preview(id=${post.id})}"
+               target="_blank">Preview page</a>
             <a th:href="@{/panorama/editor}">Cancel</a>
         </div>
     </form>

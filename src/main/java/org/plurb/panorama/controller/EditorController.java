@@ -4,6 +4,7 @@ import org.plurb.panorama.model.Post;
 import org.plurb.panorama.model.User;
 import org.plurb.panorama.repository.TagRepository;
 import org.plurb.panorama.repository.UserRepository;
+import org.plurb.panorama.service.MarkdownService;
 import org.plurb.panorama.service.PostService;
 import org.plurb.panorama.service.SeriesService;
 import org.plurb.panorama.service.UserService;
@@ -32,17 +33,20 @@ public class EditorController {
     private final PostService postService;
     private final SeriesService seriesService;
     private final UserService userService;
+    private final MarkdownService markdownService;
 
     public EditorController(UserRepository userRepository,
                             TagRepository tagRepository,
                             PostService postService,
                             SeriesService seriesService,
-                            UserService userService) {
+                            UserService userService,
+                            MarkdownService markdownService) {
         this.userRepository = userRepository;
         this.tagRepository = tagRepository;
         this.postService = postService;
         this.seriesService = seriesService;
         this.userService = userService;
+        this.markdownService = markdownService;
     }
 
     private User resolveUser(UserDetails userDetails) {
@@ -102,6 +106,26 @@ public class EditorController {
         }
         populateEditModel(model, author, post);
         return "editor/edit";
+    }
+
+    @GetMapping("/{id}/preview")
+    public String previewPost(@PathVariable Long id,
+                              @AuthenticationPrincipal UserDetails userDetails,
+                              Model model) {
+        User author = resolveUser(userDetails);
+        Post post = postService.getPostById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found: " + id));
+        if (!post.getAuthor().getId().equals(author.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        MarkdownService.RenderedContent rendered = markdownService.renderPost(post.getBodyMd());
+        model.addAttribute("author", author);
+        model.addAttribute("post", post);
+        model.addAttribute("renderedBody", rendered.html());
+        model.addAttribute("toc", rendered.toc());
+        model.addAttribute("readingMinutes", rendered.readingMinutes());
+        model.addAttribute("preview", true);
+        return "public/post";
     }
 
     @PostMapping("/{id}")

@@ -778,3 +778,20 @@ footer {
 .related a { color: var(--text); text-decoration: none; }
 .related a:hover { color: var(--accent); }
 .related-date { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+
+/* draft preview banner */
+.preview-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px dashed var(--accent);
+    border-radius: var(--radius);
+    padding: 0.6rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+.preview-banner a { color: var(--accent); text-decoration: none; white-space: nowrap; }

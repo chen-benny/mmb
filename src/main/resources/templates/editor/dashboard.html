@@ -41,6 +41,7 @@
                         : ${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">Date</td>
                 <td class="actions">
                     <a th:href="@{/panorama/editor/{id}(id=${post.id})}">Edit</a>
+                    <a th:href="@{/panorama/editor/{id}/preview(id=${post.id})}" target="_blank">Preview</a>
                     <form th:action="@{/panorama/editor/{id}/publish(id=${post.id})}" method="post"
                           style="display:inline">
                         <button type="submit"

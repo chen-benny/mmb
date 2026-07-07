@@ -5,13 +5,18 @@
 <nav th:replace="~{layout :: nav(true)}"></nav>
 
 <main class="container">
+    <div class="preview-banner" th:if="${preview}">
+        <span>Preview — <strong th:text="${post.status}">DRAFT</strong>. Only you can see this page.</span>
+        <a th:href="@{/panorama/editor/{id}(id=${post.id})}">← Back to editor</a>
+    </div>
     <article>
         <header class="post-header">
             <h1 th:text="${post.title}">Post Title</h1>
             <div class="post-meta">
                 <a th:href="@{/panorama/{username}(username=${author.username})}"
                    th:text="${author.displayName}">Author</a>
-                <span th:text="${#temporals.format(post.publishedAt, 'yyyy-MM-dd')}"></span>
+                <span th:if="${post.publishedAt != null}"
+                      th:text="${#temporals.format(post.publishedAt, 'yyyy-MM-dd')}"></span>
                 <span th:if="${readingMinutes != null}" class="reading-time"
                       th:text="${readingMinutes} + ' min read'">5 min read</span>
                 <span th:each="tag : ${post.tags}">
