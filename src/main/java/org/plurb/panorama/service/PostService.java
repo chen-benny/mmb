@@ -9,10 +9,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class PostService {
@@ -166,6 +173,59 @@ public class PostService {
     @Transactional
     public void deletePost(Post post) {
         postRepository.delete(post);
+    }
+
+    /**
+     * Bundles every post by the author (drafts and published) into a zip of
+     * markdown files with YAML front matter, split into drafts/ and published/
+     * folders. Transactional so lazy tag/series collections load while iterating.
+     */
+    @Transactional(readOnly = true)
+    public byte[] exportMarkdownZip(User author) {
+        List<Post> posts = getAllPosts(author);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ZipOutputStream zip = new ZipOutputStream(baos, StandardCharsets.UTF_8)) {
+            for (Post post : posts) {
+                String folder = post.getStatus() == PostStatus.PUBLISHED ? "published/" : "drafts/";
+                zip.putNextEntry(new ZipEntry(folder + post.getSlug() + ".md"));
+                zip.write(toMarkdownFile(post).getBytes(StandardCharsets.UTF_8));
+                zip.closeEntry();
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to build export zip", e);
+        }
+        return baos.toByteArray();
+    }
+
+    private String toMarkdownFile(Post post) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("---\n");
+        sb.append("title: ").append(yamlString(post.getTitle())).append("\n");
+        sb.append("slug: ").append(post.getSlug()).append("\n");
+        sb.append("status: ").append(post.getStatus()).append("\n");
+        if (post.getDescription() != null && !post.getDescription().isBlank()) {
+            sb.append("description: ").append(yamlString(post.getDescription())).append("\n");
+        }
+        if (!post.getTags().isEmpty()) {
+            sb.append("tags: [")
+              .append(post.getTags().stream().map(Tag::getName).collect(Collectors.joining(", ")))
+              .append("]\n");
+        }
+        post.getPostSeriesList().stream().findFirst().ifPresent(ps ->
+                sb.append("series: ").append(yamlString(ps.getSeries().getTitle())).append("\n"));
+        if (post.getPublishedAt() != null) {
+            sb.append("published_at: ").append(post.getPublishedAt()).append("\n");
+        }
+        sb.append("created_at: ").append(post.getCreatedAt()).append("\n");
+        sb.append("---\n\n");
+        String body = post.getBodyMd() == null ? "" : post.getBodyMd();
+        sb.append(body);
+        if (!body.endsWith("\n")) sb.append("\n");
+        return sb.toString();
+    }
+
+    private static String yamlString(String s) {
+        return "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 
     private void resolveSeriesMembership(User author, Post post, String seriesTitle, String seriesDescription) {

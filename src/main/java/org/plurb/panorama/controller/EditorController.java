@@ -9,6 +9,9 @@ import org.plurb.panorama.service.PostService;
 import org.plurb.panorama.service.SeriesService;
 import org.plurb.panorama.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -182,6 +185,16 @@ public class EditorController {
         }
         postService.deletePost(post);
         return "redirect:/panorama/editor";
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportPosts(@AuthenticationPrincipal UserDetails userDetails) {
+        User author = resolveUser(userDetails);
+        byte[] zip = postService.exportMarkdownZip(author);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/zip"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"panorama-export.zip\"")
+                .body(zip);
     }
 
     @GetMapping("/about")
