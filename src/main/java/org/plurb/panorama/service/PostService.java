@@ -79,6 +79,14 @@ public class PostService {
                 tagSlug, PostStatus.PUBLISHED, PageRequest.of(page, size));
     }
 
+    public List<Post> getRelatedPosts(Post post, int limit) {
+        if (post.getTags() == null || post.getTags().isEmpty()) {
+            return List.of();
+        }
+        return postRepository.findRelated(post.getAuthor(), PostStatus.PUBLISHED,
+                post.getId(), post.getTags(), PageRequest.of(0, limit));
+    }
+
     public Optional<Post> getPreviousPost(Post post) {
         var list = postRepository.findByAuthorAndStatusAndPublishedAtBeforeOrderByPublishedAtDesc(
                 post.getAuthor(), PostStatus.PUBLISHED, post.getPublishedAt(), PageRequest.of(0, 1));

@@ -2,6 +2,7 @@ package org.plurb.panorama.repository;
 
 import org.plurb.panorama.model.Post;
 import org.plurb.panorama.model.PostStatus;
+import org.plurb.panorama.model.Tag;
 import org.plurb.panorama.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,4 +50,18 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> searchPublished(@Param("q") String q);
 
     List<Post> findByStatusOrderByPublishedAtDesc(PostStatus status);
+
+    @Query("""
+            SELECT DISTINCT p FROM Post p JOIN p.tags t
+            WHERE p.author = :author
+              AND p.status = :status
+              AND p.id <> :excludeId
+              AND t IN :tags
+            ORDER BY p.publishedAt DESC
+            """)
+    List<Post> findRelated(@Param("author") User author,
+                           @Param("status") PostStatus status,
+                           @Param("excludeId") Long excludeId,
+                           @Param("tags") List<Tag> tags,
+                           Pageable pageable);
 }

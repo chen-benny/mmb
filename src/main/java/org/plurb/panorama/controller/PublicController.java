@@ -132,6 +132,7 @@ public class PublicController {
         model.addAttribute("readingMinutes", rendered.readingMinutes());
         model.addAttribute("prevPost", postService.getPreviousPost(post).orElse(null));
         model.addAttribute("nextPost", postService.getNextPost(post).orElse(null));
+        model.addAttribute("relatedPosts", postService.getRelatedPosts(post, 4));
         model.addAttribute("canonicalUrl", baseUrl + "/panorama/" + username + "/" + slug);
         model.addAttribute("rssUrl", baseUrl + "/panorama/" + username + "/feed.xml");
         return "public/post";

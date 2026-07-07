@@ -753,3 +753,28 @@ footer {
 .toc li.toc-l3 { padding-left: 1.1rem; font-size: 0.85rem; }
 .toc a { color: var(--text); text-decoration: none; }
 .toc a:hover { color: var(--accent); }
+
+/* related posts */
+.related {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+.related-title {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+}
+.related ul { list-style: none; padding: 0; margin: 0; }
+.related li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.4rem 0;
+}
+.related a { color: var(--text); text-decoration: none; }
+.related a:hover { color: var(--accent); }
+.related-date { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }

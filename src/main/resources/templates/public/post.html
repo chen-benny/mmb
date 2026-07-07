@@ -36,6 +36,18 @@
         </div>
     </article>
 
+    <section class="related" th:if="${relatedPosts != null and not #lists.isEmpty(relatedPosts)}">
+        <span class="related-title">Related</span>
+        <ul>
+            <li th:each="rel : ${relatedPosts}">
+                <a th:href="@{/panorama/{username}/{slug}(username=${author.username}, slug=${rel.slug})}"
+                   th:text="${rel.title}">Related post</a>
+                <span class="related-date"
+                      th:text="${#temporals.format(rel.publishedAt, 'yyyy-MM-dd')}"></span>
+            </li>
+        </ul>
+    </section>
+
     <nav class="post-nav">
         <div class="post-nav-prev">
             <a th:if="${prevPost != null}"
