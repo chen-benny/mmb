@@ -12,6 +12,8 @@
                 <a th:href="@{/panorama/{username}(username=${author.username})}"
                    th:text="${author.displayName}">Author</a>
                 <span th:text="${#temporals.format(post.publishedAt, 'yyyy-MM-dd')}"></span>
+                <span th:if="${readingMinutes != null}" class="reading-time"
+                      th:text="${readingMinutes} + ' min read'">5 min read</span>
                 <span th:each="tag : ${post.tags}">
                     <a class="tag"
                        th:href="@{/panorama/{username}/tag/{slug}(username=${author.username}, slug=${tag.slug})}"
@@ -19,6 +21,15 @@
                 </span>
             </div>
         </header>
+
+        <nav class="toc" th:if="${toc != null and toc.size() >= 3}">
+            <span class="toc-title">Contents</span>
+            <ul>
+                <li th:each="entry : ${toc}" th:classappend="'toc-l' + ${entry.level()}">
+                    <a th:href="'#' + ${entry.id()}" th:text="${entry.text()}">Section</a>
+                </li>
+            </ul>
+        </nav>
 
         <div class="post-body" th:utext="${renderedBody}">
             Post content here.

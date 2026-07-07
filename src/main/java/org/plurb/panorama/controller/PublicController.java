@@ -124,9 +124,12 @@ public class PublicController {
         Post post = postService.getPublishedPost(author, slug)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found: " + slug));
         postService.incrementViewCount(post.getId());
+        MarkdownService.RenderedContent rendered = markdownService.renderPost(post.getBodyMd());
         model.addAttribute("author", author);
         model.addAttribute("post", post);
-        model.addAttribute("renderedBody", markdownService.render(post.getBodyMd()));
+        model.addAttribute("renderedBody", rendered.html());
+        model.addAttribute("toc", rendered.toc());
+        model.addAttribute("readingMinutes", rendered.readingMinutes());
         model.addAttribute("prevPost", postService.getPreviousPost(post).orElse(null));
         model.addAttribute("nextPost", postService.getNextPost(post).orElse(null));
         model.addAttribute("canonicalUrl", baseUrl + "/panorama/" + username + "/" + slug);
