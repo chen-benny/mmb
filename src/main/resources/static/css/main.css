@@ -691,3 +691,40 @@ footer {
 .post-list { display: flex; flex-direction: column; gap: 2rem; }
 .post-list-item { border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
 .post-list-item h2 { font-size: 1.2rem; margin-bottom: 0.35rem; }
+
+/* markdown: tables */
+.post-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    margin-bottom: 1.25rem;
+    display: block;
+    overflow-x: auto;
+}
+.post-body th, .post-body td {
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.75rem;
+    text-align: left;
+}
+.post-body th { color: var(--muted); font-weight: 600; background: var(--surface); }
+
+/* markdown: task lists */
+.post-body li:has(> input[type="checkbox"]) { list-style: none; margin-left: -1.25rem; }
+.post-body li > input[type="checkbox"] { margin-right: 0.5rem; }
+
+/* markdown: strikethrough */
+.post-body del { color: var(--muted); }
+
+/* markdown: footnotes */
+.post-body sup.footnote-ref { font-size: 0.75em; }
+.post-body sup.footnote-ref a { text-decoration: none; padding: 0 0.15rem; }
+.post-body .footnote-backref { text-decoration: none; margin-left: 0.25rem; }
+.post-body .footnotes {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.88rem;
+    color: var(--muted);
+}
+.post-body .footnotes ol { padding-left: 1.25rem; }
+.post-body .footnotes li { margin-bottom: 0.5rem; }
